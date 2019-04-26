@@ -1,0 +1,53 @@
+{
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "profile": "okostiuk",
+      "region": "us-east-2a",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": [
+          "319448237430"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "t2.micro",
+      "ssh_pty": true,
+      "ssh_username": "ubuntu",
+      "ssh_timeout": "1m",
+
+      "ami_name": "Internal_docker(ubuntu_18.04)",
+      "ami_description": "Ubuntu (18.04) with Docker",
+      "ami_virtualization_type": "hmv",
+      "ami_regions": ["us-east-2a"],
+
+      "vpc_id": "vpc-0e3f77dd92649b9dd",
+      "subnet_id": "subnet-0ffd2f92d0e6c0c1c",
+
+      "force_deregister": true,
+      "force_delete_snapshot": true,
+
+      "launch_block_device_mappings": [
+        {
+          "device_name": "docker_with_AMI",
+          "delete_on_termination": true,
+          "volume_size": 8,
+          "volume_type": "standard"
+        }
+      ],
+      "tags": {
+          "Name": "Ubuntu (18.04) with Docker"
+      }
+    }
+  ],
+
+  "provisioners": [{
+   "type": "ansible",
+   "user": "ubuntu",
+   "playbook_file": "./playbook.yml"
+ }]
+}

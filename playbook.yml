@@ -1,0 +1,30 @@
+---
+- hosts: all
+  gather_facts: false
+
+  tasks:
+    — name: apt update
+      command: sudo apt -y update
+
+
+      — name: Install list
+        apt: "name={{item}} state=installed"
+        with_items:
+            - curl
+            - nano
+            - docker
+            - docker-compose
+
+          — name: create catolog
+            command: mkdir app
+
+              — name: copy docker project
+                copy:
+                  src:
+                  dest: ./app
+
+                   — name: go to folder with project
+                     command: cd ./app/prod
+
+                        — name: start docker project
+                          command: docker-compose up
