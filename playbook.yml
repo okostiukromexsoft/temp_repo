@@ -4,7 +4,6 @@
   become: true
   become_method: sudo
   become_user: root
-  become_flags: '-s /bin/bash'
 
   tasks:
 
