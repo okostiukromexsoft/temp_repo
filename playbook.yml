@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: all
   gather_facts: false
   become: true
   become_method: sudo
@@ -57,7 +57,8 @@
   - name: Run docker build
     shell: |
       cd /app/prod &&
-      docker-compose build
+      docker-compose build &&
+      docker-compose pull
     register: out
 
 
