@@ -9,6 +9,7 @@
 
   - name: apt update
     command: apt -y update
+    register: out
 
   - name: Install list
     apt: "name={{item}} state=latest"
@@ -19,15 +20,19 @@
             - docker-compose
             - git
             - ansible
-  - name: ClenUP application directory
+    register: out
+
+  - name: CleanUP application directory
     file:
       path: /app/
       state: absent
+    register: out
 
-  - name: create catalog
+  - name: Create catalog
     file:
       path: /app/
       state: directory
+    register: out
 
   - name: Git clone
     git:
@@ -35,8 +40,13 @@
       dest: /app
       clone: yes
       update: yes
+    register: out
 
   - name: Run docker build
     shell: |
       cd /app/prod &&
       docker-compose build
+    register: out
+
+  - debug: msg="{{ out.stdout }}"
+  - debug: msg="{{ out.stdout }}"
