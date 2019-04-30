@@ -1,5 +1,5 @@
 ---
-- hosts: localhost
+- hosts: all
   gather_facts: false
   become: true
   become_method: sudo
@@ -12,24 +12,25 @@
     command: apt -y update
 
   - name: Install list
-    apt: "name={{item}} state=installed"
+    apt: "name={{item}} state=latest"
     with_items:
             - curl
             - nano
             - docker
             - docker-compose
             - git
+            - ansible
   - name: ClenUP application directory
     shell: rm -rf /app
-    warn: false
+    warn: False
 
   - name: create catalog
     command: mkdir /app
-    warn: false
+    warn: False
 
   - name: Git clone
     git:
-      repo: 'https://okostiukromexsoft:Nfhfh1r0y@github.com/okostiukromexsoft/Docker_internal.git'
+      repo: 'https://okostiukromexsoft:F,f,fufkfvfuf321@github.com/okostiukromexsoft/Docker_internal.git'
       dest: /app
       clone: yes
       update: yes
