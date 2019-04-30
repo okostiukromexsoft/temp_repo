@@ -7,12 +7,12 @@
 
   tasks:
     - name: apt update
-        command: apt -y update
-        register: out
+      command: apt -y update
+      register: out
 
     - name: Install list
-        apt: "name={{item}} state=present"
-        with_items:
+      apt: "name={{item}} state=present"
+      with_items:
           - curl
           - nano
           - docker
@@ -21,56 +21,52 @@
           - python
           - ansible
           - wget
-        register: out
+      register: out
 
-  - name: Get zabbix
-    get_url:
-      url: http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1%2Bbionic_all.deb
-      dest: /tmp
-    register: out
+    - name: Get zabbix
+      get_url:
+        url: http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1%2Bbionic_all.deb
+        dest: /tmp
+      register: out
 
-  - name: apt update
-    command: apt -y update
-    register: out
+    - name: apt update
+      command: apt -y update
+      register: out
 
-  - name: Setup zabbix repo
-    apt: deb="/tmp/zabbix-release_3.4-1%2Bbionic_all.deb"
-    register: out
+    - name: Setup zabbix repo
+      apt: deb="/tmp/zabbix-release_3.4-1%2Bbionic_all.deb"
+      register: out
 
-  - name: Setup zabbix-agent
-    apt: "name=zabbix-agent state=present"
-    register: out
+    - name: Setup zabbix-agent
+      apt: "name=zabbix-agent state=present"
+      register: out
 
-  - name: CleanUP application directory
-    file:
-      path: /app/
-      state: absent
-    register: out
+    - name: CleanUP application directory
+      file:
+        path: /app/
+        state: absent
+      register: out
 
-  - name: Create catalog
-    file:
-      path: /app/
-      state: directory
-    register: out
+    - name: Create catalog
+      file:
+        path: /app/
+        state: directory
+      register: out
 
-  - name: Git clone
-    git:
-      repo: 'https://okostiukromexsoft:F,f,fufkfvfuf321@github.com/okostiukromexsoft/Docker_internal.git'
-      dest: /app
-      clone: yes
-      update: yes
-    register: out
+    - name: Git clone
+      git:
+        repo: 'https://okostiukromexsoft:F,f,fufkfvfuf321@github.com/okostiukromexsoft/Docker_internal.git'
+        dest: /app
+        clone: yes
+        update: yes
+      register: out
 
-  - name: Run docker build
-    shell: |
-      cd /app/prod &&
-      docker-compose build &&
-      docker-compose pull
-    register: out
+    - name: Run docker build
+      shell: |
+        cd /app/prod &&
+        docker-compose build &&
+        docker-compose pull
+      register: out
 
-
-
-
-
-  - debug: msg="{{ out.stdout }}"
-  - debug: msg="{{ out.stdout }}"
+    - debug: msg="{{ out.stdout }}"
+    - debug: msg="{{ out.stdout }}"
