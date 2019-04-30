@@ -1,30 +1,40 @@
 ---
-- hosts: all
+- hosts: localhost
   gather_facts: false
+  become: true
+  become_method: sudo
+  become_user: root
+  become_flags: '-s /bin/bash'
 
   tasks:
-    — name: apt update
-      command: sudo apt -y update
 
+  - name: apt update
+    command: apt -y update
 
-      — name: Install list
-        apt: "name={{item}} state=installed"
-        with_items:
+  - name: Install list
+    apt: "name={{item}} state=installed"
+    with_items:
             - curl
             - nano
             - docker
             - docker-compose
+            - git
+  - name: ClenUP application directory
+    shell: rm -rf /app
+    warn: false
 
-          — name: create catolog
-            command: mkdir app
+  - name: create catalog
+    command: mkdir /app
+    warn: false
 
-              — name: copy docker project
-                copy:
-                  src:
-                  dest: ./app
+  - name: Git clone
+    git:
+      repo: 'https://okostiukromexsoft:Nfhfh1r0y@github.com/okostiukromexsoft/Docker_internal.git'
+      dest: /app
+      clone: yes
+      update: yes
 
-                   — name: go to folder with project
-                     command: cd ./app/prod
-
-                        — name: start docker project
-                          command: docker-compose up
+  - name: Run docker build
+    shell: |
+      cd /app/prod &&
+      docker-compose build
