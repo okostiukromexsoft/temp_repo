@@ -12,7 +12,7 @@
     register: out
 
   - name: Install list
-    apt: "name={{item}} state=latest"
+    apt: "name={{item}} state=present"
     with_items:
             - curl
             - nano
