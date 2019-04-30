@@ -6,6 +6,22 @@
   become_user: root
 
   tasks:
+    - name: apt update
+        command: apt -y update
+        register: out
+
+    - name: Install list
+        apt: "name={{item}} state=present"
+        with_items:
+          - curl
+          - nano
+          - docker
+          - docker-compose
+          - git
+          - python
+          - ansible
+          - wget
+        register: out
 
   - name: Get zabbix
     get_url:
@@ -13,25 +29,16 @@
       dest: /tmp
     register: out
 
+  - name: apt update
+      command: apt -y update
+      register: out
+
   - name: Setup zabbix repo
     apt: deb="/tmp/zabbix-release_3.4-1%2Bbionic_all.deb"
     register: out
 
-  - name: apt update
-    command: apt -y update
-    register: out
-
-  - name: Install list
-    apt: "name={{item}} state=present"
-    with_items:
-            - curl
-            - nano
-            - docker
-            - docker-compose
-            - git
-            - python
-            - ansible
-            - zabbix-agent
+  - name: Setup zabbix-agent
+    apt: "name=zabbix-agent state=present"
     register: out
 
   - name: CleanUP application directory
