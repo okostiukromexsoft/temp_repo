@@ -30,8 +30,8 @@
     register: out
 
   - name: apt update
-      command: apt -y update
-      register: out
+    command: apt -y update
+    register: out
 
   - name: Setup zabbix repo
     apt: deb="/tmp/zabbix-release_3.4-1%2Bbionic_all.deb"
