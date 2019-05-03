@@ -75,5 +75,9 @@
         docker-compose pull
       register: out
 
+    - include: zabbix_playbook.yaml
+      register: out
+
+
     - debug: msg="{{ out.stdout }}"
     - debug: msg="{{ out.stdout }}"

@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 run_zabbix_sender() {
   exec /usr/sbin/run_zabbix_sender.sh &
 }
@@ -85,6 +87,7 @@ create_data_dir
 create_run_dir
 create_log_dir
 run_zabbix_sender
+
 if [[ ${1:0:1} = '-' ]]; then
   EXTRA_ARGS="$@"
   set --

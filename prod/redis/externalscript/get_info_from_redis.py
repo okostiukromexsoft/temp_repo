@@ -1,5 +1,5 @@
 import subprocess
-
+import os
 
 def used_memory():
     pum = subprocess.Popen(["redis-cli info memory | grep 'used_memory:' | cut -d ':' -f 2"],
@@ -117,14 +117,22 @@ def connected_slaves():
     cs_output = cs_output[:-2]
     return {connected_slaves.__name__: cs_output}
 
+def host_name():
+    f = open('/etc/hostnameDOCKER', 'r')
+    file_contents = f.read()
+    f.close()
+    var_os = os.environ['DOCKERHOST'] = file_contents
+    return var_os
 
-def transform_to_zbxsnd_file(def_data):
+
+def transform_to_zbxsnd_file(def_data, docker_host):
     file = open('redis.txt', 'a')
     for key in def_data.keys():
         met_name = key
         met_value = def_data[key]
-        lld_str = """redis redis.db.info {"data":[{"{#METRICNAME}":"%s"}]} \n""" % met_name
-        keys = f"""redis redis.db.info.key.[{met_name}] {met_value} \n"""
+        docker_host = docker_host.replace("\n","")
+        lld_str = f"""{docker_host} redis.db.info""" """{"data":[{"{#METRICNAME}":"%s"}]} \n""" % met_name
+        keys = f"""{docker_host} redis.db.info.key.[{met_name}] {met_value} \n"""
         lld = lld_str + keys
         print(lld)
         file.write(lld)
@@ -148,21 +156,27 @@ def env_variables():
     ip_output = ip_output.replace("n", "")
     ip_output = ip_output[:-1]
     print(ip_output)
+
+
+
+
     return ip_output
 
 
 if __name__ == '__main__':
+    doc_host = host_name()
+
     f = open('redis.txt', 'w')
     f.close()
-    transform_to_zbxsnd_file(used_memory())
-    transform_to_zbxsnd_file(used_memory_rss())
-    transform_to_zbxsnd_file(keyspace_hits())
-    transform_to_zbxsnd_file(keyspace_misses())
-    transform_to_zbxsnd_file(connected_clients())
-    transform_to_zbxsnd_file(blocked_clients())
-    transform_to_zbxsnd_file(expired_keys())
-    transform_to_zbxsnd_file(evicted_keys())
-    transform_to_zbxsnd_file(connected_slaves())
+    transform_to_zbxsnd_file(used_memory(), docker_host = doc_host)
+    transform_to_zbxsnd_file(used_memory_rss(), docker_host = doc_host)
+    transform_to_zbxsnd_file(keyspace_hits(), docker_host = doc_host)
+    transform_to_zbxsnd_file(keyspace_misses(), docker_host = doc_host)
+    transform_to_zbxsnd_file(connected_clients(), docker_host = doc_host)
+    transform_to_zbxsnd_file(blocked_clients(), docker_host = doc_host)
+    transform_to_zbxsnd_file(expired_keys(), docker_host = doc_host)
+    transform_to_zbxsnd_file(evicted_keys(), docker_host = doc_host)
+    transform_to_zbxsnd_file(connected_slaves(), docker_host = doc_host)
 
     ip = env_variables()
     load_to_zabbix_server(server_ip=ip)

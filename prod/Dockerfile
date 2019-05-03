@@ -12,6 +12,7 @@ ARG    DB_PASS
 ARG    MYSQL_USER
 ARG    MYSQL_COLLATION
 ARG    ZABBIX_SERVER
+ARG    DOCKERHOST
 
 
 ENV    DEBIAN_FRONTEND noninteractive
@@ -26,6 +27,7 @@ ENV    MYSQL_CHARSET=${MYSQL_CHARSET}
 ENV    MYSQL_USER=${MYSQL_USER}
 ENV    MYSQL_COLLATION=${MYSQL_COLLATION}
 ENV    ZABBIX_SERVER=${ZABBIX_SERVER}
+ENV    DOCKERHOST=${DOCKERHOST}
 
 
 RUN set -xe \
@@ -73,6 +75,7 @@ RUN curl https://bootstrap.pypa.io/get-pip.py | sudo -H python3.6
 RUN pip3 install -r /app/requirements.txt
 COPY src/var/lib/externalscript/run_zabbix_sender.sh /usr/sbin
 RUN  chmod +x /usr/sbin/run_zabbix_sender.sh
+
 
 EXPOSE 3306/tcp
 VOLUME ["${MYSQL_DATA_DIR}", "${MYSQL_RUN_DIR}"]

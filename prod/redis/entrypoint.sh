@@ -1,7 +1,9 @@
 #!/bin/bash
+
 set -e
 
 REDIS_PASSWORD=${REDIS_PASSWORD:-}
+
 
 run_sender() {
   exec /usr/sbin/run_sender.sh &

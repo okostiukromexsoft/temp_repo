@@ -1,5 +1,6 @@
 import mysql.connector
 import subprocess
+import os
 
 
 def export_db(host1, user1, passwd1):
@@ -34,18 +35,27 @@ def export_db(host1, user1, passwd1):
     return db_count
 
 
-def transform_to_zbxsnd_file(import_db):
-    file = open('text.txt', 'w')
+def host_name():
+    f = open('/etc/hostnameDOCKER', 'r')
+    file_contents = f.read()
+    f.close()
+    var_os = os.environ['DOCKERHOST'] = file_contents
+    return var_os
 
+
+def transform_to_zbxsnd_file(import_db, docker_host):
+    file = open('text.txt', 'w')
     for db in import_db.keys():
         db_name = db
         db_rows = import_db[db]
-        lld_str = """db0_wordpress db0.wordpress.sum.rows {"data":[{"{#DBNAME}":"%s"}]} \n""" % db_name
-        keys = f"""db0_wordpress db0.wordpress.sum.rows.sum.[{db_name}] {db_rows} \n"""
+        docker_host = docker_host.replace("\n", "")
+        lld_str = f"""{docker_host} mysql.db.sum.rows""" """{"data":[{"{#DBNAME}":"%s"}]} \n""" % db_name
+        keys = f"""{docker_host} mysql.db.sum.rows.sum.[{db_name}] {db_rows} \n"""
         lld = lld_str + keys
         print(lld)
         file.write(lld)
     file.close()
+
 
 
 def env_variables():
@@ -98,6 +108,9 @@ if __name__ == "__main__":
     user = env_variables()[2]
     pas = env_variables()[3]
 
-    transform_to_zbxsnd_file(export_db(host1=host, user1=user, passwd1=pas))
+    doc_host = host_name()
+
+    transform_to_zbxsnd_file(export_db(host1=host, user1=user, passwd1=pas), docker_host = doc_host)
+
 
     load_to_zabbix_server(server_ip=ip)

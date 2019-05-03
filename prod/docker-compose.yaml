@@ -19,6 +19,7 @@ services:
      volumes:
        - db_data:/var/lib/mysql
        - ./src/var/log/db0:/var/log/mysql
+       - /etc/hostname:/etc/hostnameDOCKER
      restart: always
 
    wordpress_first_server:
@@ -80,6 +81,7 @@ services:
       volumes:
        - ./src/var/log/redis:/var/log/redis
        - ./src/redis:/app
+       - /etc/hostname:/etc/hostnameDOCKER
 
 volumes:
   db_data:
