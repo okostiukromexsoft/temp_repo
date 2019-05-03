@@ -31,7 +31,7 @@
 
     - name: Get zabbix
       get_url:
-        url: http://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
+        url: https://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
         dest: /tmp
       register: out
 
