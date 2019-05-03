@@ -1,5 +1,5 @@
 ---
-- hosts: default
+- hosts: localhost
   gather_facts: false
   become: true
   become_method: sudo
@@ -9,8 +9,7 @@
     - name: Install python for Ansible
       raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
       register: out
-      changed_when: output.stdout != ""
-
+    - setup:
 
   tasks:
     - name: apt update
@@ -32,7 +31,7 @@
 
     - name: Get zabbix
       get_url:
-        url: http://repo.zabbix.com/zabbix/3.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_3.4-1%2Bbionic_all.deb
+        url: http://repo.zabbix.com/zabbix/4.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_4.0-2+bionic_all.deb
         dest: /tmp
       register: out
 
@@ -41,7 +40,7 @@
       register: out
 
     - name: Setup zabbix repo
-      apt: deb="/tmp/zabbix-release_3.4-1%2Bbionic_all.deb"
+      apt: deb="/tmp/zabbix-release_4.0-2+bionic_all.deb"
       register: out
 
     - name: Setup zabbix-agent
@@ -75,9 +74,7 @@
         docker-compose pull
       register: out
 
-    - include: zabbix_playbook.yaml
-      register: out
-
-
     - debug: msg="{{ out.stdout }}"
     - debug: msg="{{ out.stdout }}"
+
+- import_playbook: zabbix_playbook.yml
