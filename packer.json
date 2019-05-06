@@ -1,50 +1,47 @@
 {
+   "variables": {
+    "name": "Internal_docker(ubuntu_18.04)",
+    "aws_region": "us-east-2",
+    "security_group_id": "sg-05327b287f6e4bb24"
+   },
   "builders": [
     {
       "type": "amazon-ebs",
-      "profile": "okostiuk",
-      "region": "us-east-2",
-      "source_ami_filter": {
-        "filters": {
-          "virtualization-type": "hvm",
-          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
-          "root-device-type": "ebs"
-        },
-        "owners": [
-          "319448237430"
-        ],
-        "most_recent": true
-      },
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_region`}}",
+      "vpc_id": "vpc-0e3f77dd92649b9dd",
+      "subnet_id": "subnet-092b3f0aabc1ac1f4",
+      "associate_public_ip_address": true,
+      "security_group_id": "{{user `security_group_id`}}",
       "instance_type": "t2.micro",
       "ssh_username": "ubuntu",
-      "ssh_timeout": "1m",
+      "ami_name": "{{user `name`}}",
+      "run_tags":{"Name":"{{user `name`}}"},
 
-      "ami_name": "Internal_docker(ubuntu_18.04)",
-      "ami_description": "Ubuntu (18.04) with Docker",
-      "ami_virtualization_type": "hmv",
-      "ami_regions": ["us-east-2"],
-
-      "vpc_id": "vpc-0e3f77dd92649b9dd",
-      "subnet_id": "subnet-0ffd2f92d0e6c0c1c",
+      "source_ami": "ami-033a0960d9d83ead0",
 
       "force_deregister": true,
       "force_delete_snapshot": true,
-
       "launch_block_device_mappings": [
         {
-          "device_name": "docker_with_AMI",
-          "delete_on_termination": true,
+          "device_name": "/dev/xvdf",
+          "volume_type": "standard",
           "volume_size": 20,
-          "volume_type": "standard"
+          "delete_on_termination": true
         }
-      ],
-      "tags": {
-          "Name": "Ubuntu (18.04) with Docker"
-      }
+      ]
     }
   ],
 
-  "provisioners": [{
+  "provisioners": [
+    {
+        "type": "shell",
+        "inline": [
+          "sudo apt-get update && sudo apt-get -y install python-minimal"
+        ]
+      },
+    {
    "type": "ansible",
    "user": "ubuntu",
    "playbook_file": "./playbook.yml"
