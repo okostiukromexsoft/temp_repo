@@ -36,14 +36,8 @@
 
   - lineinfile:
       path: /etc/zabbix/zabbix_agentd.conf
-      regexp: '^# HostMetadata= '
+      regexp: '^# HostMetadata='
       line: 'HostMetadata=linux'
 
-  - lineinfile:
-      path: /etc/zabbix/zabbix_agentd.conf
-      regexp: '^# TLSPSKIdentity='
-      line: 'TLSPSKIdentity=753159852456'
-
-
-  - name: restart zabbix-agent
-    service: name=zabbix-agent state=restarted
+  - name: Starting the Zabbix Agent
+    service: name=zabbix-agent state=started enabled=yes
