@@ -76,3 +76,5 @@
 
     - debug: msg="{{ out.stdout }}"
     - debug: msg="{{ out.stdout }}"
+
+- import_playbook: zabbix_playbook.yml
