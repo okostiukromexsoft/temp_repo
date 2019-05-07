@@ -66,11 +66,5 @@
         docker-compose pull
       register: out
 
-    - name: Start second playbook
-      script: /app/zabbix_playbook.yml
-      args:
-        executable: ansible
-
     - debug: msg="{{ out.stdout }}"
     - debug: msg="{{ out.stdout }}"
-

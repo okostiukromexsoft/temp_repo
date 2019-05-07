@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   vars:
-    zabbix_server: "18.216.37.140"
+    zabbix_server: "10.0.0.42"
 
   tasks:
   - lineinfile:
@@ -27,7 +27,12 @@
   - lineinfile:
       path: /etc/zabbix/zabbix_agentd.conf
       regexp: '^Hostname=Zabbix server'
-      line: 'Hostname=system.uname'
+      line: '# Hostname=system.uname'
+
+  - lineinfile:
+      path: /etc/zabbix/zabbix_agentd.conf
+      regexp: '^# HostnameItem=system.hostname'
+      line: 'HostnameItem=system.hostname'
 
   - lineinfile:
       path: /etc/zabbix/zabbix_agentd.conf
