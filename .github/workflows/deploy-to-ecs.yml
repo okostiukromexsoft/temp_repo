@@ -1,0 +1,83 @@
+name: Deploy releases
+on:
+  release:
+    types: [published, edited, prereleased, released]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get Release Version
+        run: echo ::set-output name=version::$(echo ${GITHUB_REF:10})
+        id: tag
+
+      - name: Create Realease file
+        run: echo ${RELEASE_VERSION} > release.txt
+        env:
+          RELEASE_VERSION: ${{ steps.tag.outputs.version }}
+
+      - uses: pCYSl5EDgo/cat@master
+        id: release
+        with:
+          path: release.txt
+
+      - name: Verify Release
+        run: echo $TXT
+        env:
+          TXT: ${{ steps.release.outputs.release }}
+      ######################## PreProd section ########################################
+      - if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'edited') && github.event.release.prerelease == true
+        name: Push Release number
+        uses: docker://amazon/aws-cli:2.0.7
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PIPELINE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PIPELINE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: "us-west-2"
+        with:
+          args: s3 cp release.txt s3://diderot-cloudformation-ecs-prod-us-west-2/
+
+      - if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'edited') && github.event.release.prerelease == true
+        name: Start Release back-end to PRE-Production environment
+        uses: docker://amazon/aws-cli:2.0.7
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PIPELINE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PIPELINE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: "us-west-2"
+          PIPELINE_NAME: "ecs-prod-django-pipeline"
+        with:
+            args: codepipeline start-pipeline-execution --name ${{ env.PIPELINE_NAME }}
+
+      - if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'edited') && github.event.release.prerelease == true
+        name: Start Release UI to PRE-Production environment
+        uses: docker://amazon/aws-cli:2.0.7
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PIPELINE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PIPELINE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: "us-west-2"
+          PIPELINE_NAME: "ecs-prod-pipeline-ui"
+        with:
+          args: codepipeline start-pipeline-execution --name ${{ env.PIPELINE_NAME }}
+
+      ######################## Production section ##############################################
+
+      - if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'edited')  && github.event.release.prerelease == false
+        name: Push Release number
+        uses: docker://amazon/aws-cli:2.0.7
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PIPELINE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PIPELINE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+          PIPELINE_NAME: "ecs-prod-django-pipeline"
+        with:
+          args: s3 cp release.txt s3://diderot-production-nested-ecs-prod-us-east-1/
+
+      - if: github.event_name == 'release' && (github.event.action == 'published' || github.event.action == 'edited')  && github.event.release.prerelease == false
+        name: Push Release number
+        uses: docker://amazon/aws-cli:2.0.7
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_PIPELINE_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_PIPELINE_SECRET_KEY }}
+          AWS_DEFAULT_REGION: "us-east-1"
+          PIPELINE_NAME: "ecs-prod-django-pipeline"
+        with:
+          args: codepipeline start-pipeline-execution --name ${{ env.PIPELINE_NAME }}
